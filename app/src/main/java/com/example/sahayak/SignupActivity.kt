@@ -2,6 +2,7 @@ package com.example.sahayak
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.sahayak.ui.theme.SahayakTheme
+import android.util.Patterns
 
 class SignupActivity : ComponentActivity() {
 
@@ -111,11 +113,12 @@ class SignupActivity : ComponentActivity() {
 
             Button(
                 onClick = {
-                    if (password == confirmPassword) {
-                        startActivity(Intent(this@SignupActivity, SigninActivity::class.java))
+                    if (validateInput(email, password, confirmPassword)) {
+                        startActivity(Intent(this@SignupActivity, SigninActivitySecond::class.java))
                         finish()
                     } else {
-                        // Show error
+                        // Show error if validation fails
+                        Toast.makeText(this@SignupActivity, "Invalid email or passwords don't match", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -136,6 +139,10 @@ class SignupActivity : ComponentActivity() {
                 textAlign = TextAlign.Center
             )
         }
+    }
+
+    private fun validateInput(email: String, password: String, confirmPassword: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.isNotEmpty() && password == confirmPassword
     }
 
     @Composable

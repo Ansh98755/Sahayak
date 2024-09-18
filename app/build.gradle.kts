@@ -62,6 +62,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.2.0")
     implementation("androidx.compose.material:material-icons-core:1.5.1")
     implementation("androidx.compose.material:material-icons-extended:1.5.1")
+    implementation("com.google.firebase:firebase-auth:22.1.0") // Firebase Authentication
+    implementation(platform("com.google.firebase:firebase-bom:32.0.0")) // Firebase BOM
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -70,3 +72,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
+
