@@ -1,185 +1,193 @@
 package com.example.sahayak
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.sahayak.ui.theme.SahayakTheme
-import android.util.Patterns
 
 class SignupActivity : ComponentActivity() {
 
+    private lateinit var sharedPreferences: android.content.SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences("SahayakPrefs", Context.MODE_PRIVATE)
+
+        // Set Compose content
         setContent {
             SahayakTheme {
-                SignupScreen()
+                SignUpScreen(
+                    onSignUpClick = { email, password -> handleSignUp(email, password) }
+                )
             }
         }
     }
 
-    @Composable
-    fun SignupScreen(modifier: Modifier = Modifier) {
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var confirmPassword by remember { mutableStateOf("") }
-        var passwordVisible by remember { mutableStateOf(false) }
-        var confirmPasswordVisible by remember { mutableStateOf(false) }
+    private fun handleSignUp(email: String, password: String) {
+        // Basic email and password validation
+        if (!isValidEmail(email)) {
+            Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show()
+            return
+        }
 
+        if (password.length < 6) {
+            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Save email to SharedPreferences
+        saveEmailToPrefs(email)
+
+        // Navigate to SigninActivitySecond after successful signup
+        val intent = Intent(this, SigninActivitySecond::class.java)
+        intent.putExtra("email", email)
+        startActivity(intent)
+        finish() // Close SignupActivity
+    }
+
+    private fun isValidEmail(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    private fun saveEmailToPrefs(email: String) {
+        sharedPreferences.edit().putString("savedEmail", email).apply()
+    }
+}
+
+@Composable
+fun SignUpScreen(
+    onSignUpClick: (String, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        // Background image
+        Image(
+            painter = painterResource(id = R.drawable.cover1), // Replace with your background image resource
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        // Foreground content
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .background(Color.Gray)
+                .background(Color.Transparent) // Transparent background to overlay on top of the image
         ) {
             Image(
-                painter = painterResource(id = R.drawable.cover1),
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
+                    .height(250.dp)
                     .padding(top = 10.dp)
             )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
             Text(
-                text = "Register",
+                text = "Sign Up",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     color = Color.White,
-                    fontSize = 50.sp,
+                    fontSize = 40.sp,
                     fontWeight = FontWeight.Bold
                 ),
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
+                color = Color.White
             )
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            OutlinedTextField(
+            BasicTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                decorationBox = { innerTextField ->
+                    Box(
+                        Modifier
+                            .background(Color.White)
+                            .padding(16.dp)
+                    ) {
+                        if (email.isEmpty()) {
+                            Text("Enter email", color = Color.Gray)
+                        }
+                        innerTextField()
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 15.dp)
             )
 
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            CustomTextField(
-                label = "Password",
+            BasicTextField(
                 value = password,
                 onValueChange = { password = it },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                togglePasswordVisibility = { passwordVisible = !passwordVisible }
-            )
-
-            Spacer(modifier = Modifier.height(15.dp))
-
-            CustomTextField(
-                label = "Confirm Password",
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it },
-                visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                togglePasswordVisibility = { confirmPasswordVisible = !confirmPasswordVisible }
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Button(
-                onClick = {
-                    if (validateInput(email, password, confirmPassword)) {
-                        startActivity(Intent(this@SignupActivity, SigninActivitySecond::class.java))
-                        finish()
-                    } else {
-                        // Show error if validation fails
-                        Toast.makeText(this@SignupActivity, "Invalid email or passwords don't match", Toast.LENGTH_SHORT).show()
+                decorationBox = { innerTextField ->
+                    Box(
+                        Modifier
+                            .background(Color.White)
+                            .padding(16.dp)
+                    ) {
+                        if (password.isEmpty()) {
+                            Text("Enter password", color = Color.Gray)
+                        }
+                        innerTextField()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Register", color = Color.White)
-            }
-
-            Spacer(modifier = Modifier.height(15.dp))
-
-            Text(
-                text = "Already have an account? Sign In",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { startActivity(Intent(this@SignupActivity, SigninActivity::class.java)) },
-                textAlign = TextAlign.Center
+                    .padding(bottom = 15.dp)
             )
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            Button(
+                onClick = { onSignUpClick(email, password) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+            ) {
+                Text(text = "Sign Up", color = Color.White)
+            }
         }
     }
+}
 
-    private fun validateInput(email: String, password: String, confirmPassword: String): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.isNotEmpty() && password == confirmPassword
-    }
-
-    @Composable
-    fun CustomTextField(
-        label: String,
-        value: String,
-        onValueChange: (String) -> Unit,
-        modifier: Modifier = Modifier,
-        visualTransformation: VisualTransformation = VisualTransformation.None,
-        togglePasswordVisibility: (() -> Unit)? = null
-    ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            label = { Text(text = label) },
-            visualTransformation = visualTransformation,
-            trailingIcon = {
-                if (togglePasswordVisibility != null) {
-                    IconButton(onClick = togglePasswordVisibility) {
-                        val icon = if (visualTransformation is PasswordVisualTransformation) {
-                            Icons.Filled.VisibilityOff
-                        } else {
-                            Icons.Filled.Visibility
-                        }
-                        Icon(icon, contentDescription = "Toggle password visibility")
-                    }
-                }
-            },
-            modifier = modifier
-        )
-    }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun SignupScreenPreview() {
-        SahayakTheme {
-            SignupScreen()
-        }
+@Preview(showBackground = true)
+@Composable
+fun SignUpScreenPreview() {
+    SahayakTheme {
+        SignUpScreen(onSignUpClick = { _, _ -> })
     }
 }

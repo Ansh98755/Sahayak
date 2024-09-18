@@ -20,6 +20,10 @@
             "package_name": "com.example.sahayak",
             "certificate_hash": "f6bd27030fdaf74e86135c785a1210ec970e78f3"
           }
+        },
+        {
+          "client_id": "54958400637-bfsoiqssib11nf72rf8f3segnv0ik48k.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -29,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "54958400637-bfsoiqssib11nf72rf8f3segnv0ik48k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
