@@ -8,11 +8,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,8 +21,6 @@ import androidx.compose.ui.unit.sp
 import com.example.sahayak.ui.theme.SahayakTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.ui.platform.LocalContext
 
 class SigninActivitySecond : ComponentActivity() {
@@ -101,6 +97,14 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
                 color = Color.Black
             )
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = { navigateToBooktest(context) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+            ) {
+                Text(text = "Book Your Bed", color = Color.White)
+            }
         } ?: run {
             Text(
                 text = "No user logged in.",
@@ -111,7 +115,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
     }
 }
 
-fun handleLogout(context: android.content.Context) {
+private fun handleLogout(context: android.content.Context) {
     try {
         FirebaseAuth.getInstance().signOut()
         // Navigate back to SignInActivity
@@ -120,6 +124,11 @@ fun handleLogout(context: android.content.Context) {
     } catch (e: Exception) {
         Log.e("SigninActivitySecond", "Failed to log out", e)
     }
+}
+
+private fun navigateToBooktest(context: android.content.Context) {
+    val intent = Intent(context, Booktest::class.java)
+    context.startActivity(intent)
 }
 
 @Preview(showBackground = true)

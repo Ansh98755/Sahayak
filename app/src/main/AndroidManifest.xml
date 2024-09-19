@@ -21,11 +21,6 @@
             android:exported="true"
             android:label="@string/title_activity_booktest"
             android:theme="@style/Theme.Sahayak">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <!-- Ensure this points to your Application class -->
         <!-- SplashActivity as launcher activity -->
