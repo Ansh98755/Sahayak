@@ -6,4 +6,5 @@
     <string name="title_activity_intermediate">IntermediateActivity</string>
     <string name="title_activity_signin_second">SigninActivitySecond</string> <!-- Updated here -->
     <string name="default_web_client_id">YOUR_CLIENT_ID</string>
+    <string name="title_activity_booktest">Booktest</string>
 </resources>

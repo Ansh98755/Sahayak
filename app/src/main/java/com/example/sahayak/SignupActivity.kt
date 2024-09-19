@@ -11,10 +11,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,16 +27,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sahayak.ui.theme.SahayakTheme
+import com.google.firebase.auth.FirebaseAuth
 
 class SignupActivity : ComponentActivity() {
 
-    private lateinit var sharedPreferences: android.content.SharedPreferences
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize SharedPreferences
-        sharedPreferences = getSharedPreferences("SahayakPrefs", Context.MODE_PRIVATE)
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance()
 
         // Set Compose content
         setContent {
@@ -49,7 +50,6 @@ class SignupActivity : ComponentActivity() {
     }
 
     private fun handleSignUp(email: String, password: String) {
-        // Basic email and password validation
         if (!isValidEmail(email)) {
             Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show()
             return
@@ -60,14 +60,19 @@ class SignupActivity : ComponentActivity() {
             return
         }
 
-        // Save email to SharedPreferences
-        saveEmailToPrefs(email)
-
-        // Navigate to SigninActivitySecond after successful signup
-        val intent = Intent(this, SigninActivitySecond::class.java)
-        intent.putExtra("email", email)
-        startActivity(intent)
-        finish() // Close SignupActivity
+        // Create user with email and password
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    saveEmailToPrefs(email)
+                    val intent = Intent(this, SigninActivitySecond::class.java)
+                    intent.putExtra("email", email)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Toast.makeText(this, "Sign-Up failed: ${task.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private fun isValidEmail(email: String): Boolean {
@@ -75,6 +80,7 @@ class SignupActivity : ComponentActivity() {
     }
 
     private fun saveEmailToPrefs(email: String) {
+        val sharedPreferences = getSharedPreferences("SahayakPrefs", Context.MODE_PRIVATE)
         sharedPreferences.edit().putString("savedEmail", email).apply()
     }
 }
@@ -94,10 +100,16 @@ fun SignUpScreen(
     ) {
         // Background image
         Image(
-            painter = painterResource(id = R.drawable.cover1), // Replace with your background image resource
+            painter = painterResource(id = R.drawable.cover1), // Ensure this resource exists
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.4f)) // Adjust alpha for desired opacity
         )
 
         // Foreground content
@@ -105,16 +117,17 @@ fun SignUpScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .background(Color.Transparent) // Transparent background to overlay on top of the image
+//                .background(Color.Transparent) // Transparent background to overlay on top of the image
         ) {
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.logo), // Ensure this resource exists
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
                     .padding(top = 10.dp)
             )
+
             Text(
                 text = "Sign Up",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -122,53 +135,38 @@ fun SignUpScreen(
                     fontSize = 40.sp,
                     fontWeight = FontWeight.Bold
                 ),
-                modifier = Modifier.fillMaxWidth(),
-                color = Color.White
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            BasicTextField(
+            OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                decorationBox = { innerTextField ->
-                    Box(
-                        Modifier
-                            .background(Color.White)
-                            .padding(16.dp)
-                    ) {
-                        if (email.isEmpty()) {
-                            Text("Enter email", color = Color.Gray)
-                        }
-                        innerTextField()
-                    }
-                },
+                label = { Text("Email") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 15.dp)
+                    .padding(bottom = 15.dp),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            BasicTextField(
+            OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
+                label = { Text("Password") },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                decorationBox = { innerTextField ->
-                    Box(
-                        Modifier
-                            .background(Color.White)
-                            .padding(16.dp)
-                    ) {
-                        if (password.isEmpty()) {
-                            Text("Enter password", color = Color.Gray)
-                        }
-                        innerTextField()
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        val icon = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
+                        Icon(icon, contentDescription = "Toggle password visibility")
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 15.dp)
+                    .padding(bottom = 15.dp),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(40.dp))

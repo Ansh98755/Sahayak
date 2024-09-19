@@ -41,11 +41,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 
 class SigninActivity : ComponentActivity() {
 
     // Google Sign-In variables
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var auth: FirebaseAuth
 
     // Register for activity result
     private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -58,10 +62,13 @@ class SigninActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance()
+
         // Google Sign-In setup
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            // Add requestIdToken() if needed for your backend
+            .requestIdToken(getString(R.string.default_web_client_id)) // Ensure you have this ID from Google Cloud Console
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
@@ -73,8 +80,7 @@ class SigninActivity : ComponentActivity() {
                     onGoogleSignInClick = { signInWithGoogle() },
                     onManualSignInClick = { email, password ->
                         if (validateManualSignIn(email, password)) {
-                            startActivity(Intent(this, SigninActivitySecond::class.java))
-                            finish()
+                            signInWithEmail(email, password)
                         } else {
                             Toast.makeText(this, "Please enter valid email and password", Toast.LENGTH_SHORT).show()
                         }
@@ -85,7 +91,7 @@ class SigninActivity : ComponentActivity() {
     }
 
     private fun signInWithGoogle() {
-        // Sign out any existing Google accounts before proceeding
+        // Sign out any existing Google accounts to refresh the account picker
         googleSignInClient.signOut().addOnCompleteListener {
             // After signing out, launch the Google Sign-In Intent
             val signInIntent = googleSignInClient.signInIntent
@@ -97,10 +103,31 @@ class SigninActivity : ComponentActivity() {
         try {
             val account = task.getResult(ApiException::class.java)
             if (account != null) {
-                navigateToNextActivity()
+                val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+                auth.signInWithCredential(credential).addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        // Sign in success
+                        navigateToNextActivity()
+                    } else {
+                        // Sign in failed
+                        Toast.makeText(this, "Google Sign-In failed: ${task.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         } catch (e: ApiException) {
             Toast.makeText(this, "Google Sign-In failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun signInWithEmail(email: String, password: String) {
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                // Sign in success
+                navigateToNextActivity()
+            } else {
+                // Sign in failed
+                Toast.makeText(this, "Manual Sign-In failed: ${task.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -149,7 +176,7 @@ fun SignInScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
+                    .height(150.dp)
                     .padding(top = 10.dp)
             )
 

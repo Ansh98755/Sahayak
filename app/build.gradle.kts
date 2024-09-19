@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.gms.google-services") // Apply the Google services plugin here
 }
 
 android {
@@ -40,7 +41,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.1" // Ensure this matches your Compose BOM version
     }
     packaging {
         resources {
@@ -62,7 +63,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.2.0")
     implementation("androidx.compose.material:material-icons-core:1.5.1")
     implementation("androidx.compose.material:material-icons-extended:1.5.1")
-    implementation("com.google.firebase:firebase-auth:22.1.0") // Firebase Authentication
+    implementation("com.google.firebase:firebase-auth") // Use BOM version
     implementation(platform("com.google.firebase:firebase-bom:32.0.0")) // Firebase BOM
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -72,4 +73,3 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
-
