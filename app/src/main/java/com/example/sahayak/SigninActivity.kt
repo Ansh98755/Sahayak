@@ -81,7 +81,8 @@ class SigninActivity : ComponentActivity() {
                     onManualSignInClick = { email, password ->
                         if (validateManualSignIn(email, password)) {
                             signInWithEmail(email, password)
-                        } else {
+                        } else
+                        {
                             Toast.makeText(this, "Please enter valid email and password", Toast.LENGTH_SHORT).show()
                         }
                     }

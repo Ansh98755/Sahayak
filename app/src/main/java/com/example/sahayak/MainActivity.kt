@@ -30,7 +30,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             SahayakApp(
                 onLoginClick = { navigateTo(SigninActivity::class.java) },
-                onRegisterClick = { navigateTo(SignupActivity::class.java) }
+                onRegisterClick = { navigateTo(SignupActivity::class.java) },
+                onSkipClick = { navigateTo(Booktest::class.java) } // Added listener for Skip
             )
         }
     }
@@ -42,7 +43,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun SahayakApp(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
+fun SahayakApp(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, onSkipClick: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.White
@@ -122,7 +123,7 @@ fun SahayakApp(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
                     color = Color.White,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { /* Handle Skip action */ }
+                        .clickable { onSkipClick() } // Updated to call onSkipClick
                         .padding(vertical = 8.dp),
                     textAlign = TextAlign.Center
                 )

@@ -31,13 +31,19 @@ class IntermediateActivity : ComponentActivity() {
             // Intermediate Screen Content
             UserStaffSelection(
                 onUserClick = { navigateToMainActivity() },
-                onStaffClick = { navigateToMainActivity() }
+                onStaffClick = { navigateToStaffActivity() }
             )
         }
     }
 
     // Navigation to MainActivity
     private fun navigateToMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    fun navigateToStaffActivity(){
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()
