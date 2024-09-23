@@ -36,14 +36,15 @@ class IntermediateActivity : ComponentActivity() {
         }
     }
 
-    // Navigation to MainActivity
-    private fun navigateToMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
+    fun navigateToStaffActivity() {
+        val intent = Intent(this, StaffActivity::class.java) // Change this line
         startActivity(intent)
         finish()
     }
 
-    fun navigateToStaffActivity(){
+
+    // Navigation to MainActivity
+    private fun navigateToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()
