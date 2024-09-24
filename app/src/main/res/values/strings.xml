@@ -8,4 +8,5 @@
     <string name="default_web_client_id">YOUR_CLIENT_ID</string>
     <string name="title_activity_booktest">Booktest</string>
     <string name="title_activity_staff">StaffActivity</string>
+    <string name="title_activity_hospital">HospitalActivity</string>
 </resources>

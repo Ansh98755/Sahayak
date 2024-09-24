@@ -4,6 +4,8 @@
     package="com.example.sahayak">
     <!-- Required permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".MyApp"
@@ -21,17 +23,15 @@
             android:exported="true"
             android:label="@string/title_activity_staff"
             android:theme="@style/Theme.Sahayak">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".Booktest"
             android:exported="true"
             android:label="@string/title_activity_booktest"
-            android:theme="@style/Theme.Sahayak"></activity> <!-- Ensure this points to your Application class -->
+            android:theme="@style/Theme.Sahayak">
+
+        </activity> <!-- Ensure this points to your Application class -->
         <!-- SplashActivity as launcher activity -->
         <activity
             android:name=".SplashActivity"

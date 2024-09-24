@@ -65,6 +65,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.5.1")
     implementation("com.google.firebase:firebase-auth") // Use BOM version
     implementation(platform("com.google.firebase:firebase-bom:32.0.0")) // Firebase BOM
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
