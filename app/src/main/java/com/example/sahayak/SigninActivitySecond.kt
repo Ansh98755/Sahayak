@@ -127,9 +127,11 @@ private fun handleLogout(context: android.content.Context) {
 }
 
 private fun navigateToBooktest(context: android.content.Context) {
+    Log.d("SigninActivitySecond", "Navigating to Booktest")
     val intent = Intent(context, Booktest::class.java)
     context.startActivity(intent)
 }
+
 
 @Preview(showBackground = true)
 @Composable
