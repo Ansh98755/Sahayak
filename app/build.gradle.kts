@@ -66,6 +66,9 @@ dependencies {
     implementation("com.google.firebase:firebase-auth") // Use BOM version
     implementation(platform("com.google.firebase:firebase-bom:32.0.0")) // Firebase BOM
     implementation ("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
