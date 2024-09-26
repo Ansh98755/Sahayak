@@ -9,4 +9,6 @@
     <string name="title_activity_booktest">Booktest</string>
     <string name="title_activity_staff">StaffActivity</string>
     <string name="title_activity_hospital">HospitalActivity</string>
+    <string name="title_activity_location_iqservice">LocationIQService</string>
+    <string name="title_activity_hospital_response">HospitalResponse</string>
 </resources>
