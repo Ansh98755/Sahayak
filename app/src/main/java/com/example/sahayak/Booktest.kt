@@ -24,10 +24,9 @@ import retrofit2.Response
 
 class Booktest : ComponentActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val apiKey = "pk.30720f07057a2070587d16882c5c01c7"  // Replace with your actual LocationIQ Access Token
 
-    // Correctly declare a mutable state for hospitals
-    private var hospitalsState by mutableStateOf(emptyList<HospitalResponse>())
+    // Declare a mutable state for hospitals
+    private val hospitalsState = mutableStateOf(emptyList<HospitalResponse>())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +35,7 @@ class Booktest : ComponentActivity() {
 
         setContent {
             SahayakTheme {
-                HospitalListScreen(hospitals = hospitalsState)
+                HospitalListScreen(hospitals = hospitalsState.value)
             }
         }
 
@@ -75,13 +74,11 @@ class Booktest : ComponentActivity() {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             return
         }
+
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }
 
@@ -95,21 +92,21 @@ class Booktest : ComponentActivity() {
     }
 
     private fun fetchNearbyHospitals(latitude: Double, longitude: Double) {
-        val call = LocationIQService.create().getNearbyHospitals(apiKey, latitude, longitude)
+        val call = NominatimService.create().getNearbyHospitals("hospital", latitude = latitude, longitude = longitude)
         call.enqueue(object : Callback<List<HospitalResponse>> {
             override fun onResponse(call: Call<List<HospitalResponse>>, response: Response<List<HospitalResponse>>) {
-                Log.d("API Response", response.body().toString()) // Log the response
+                Log.d("API Response", response.raw().toString()) // Log the raw response
+
                 if (response.isSuccessful) {
-                    val hospitals: List<HospitalResponse> = response.body() ?: emptyList() // Use emptyList() if the body is null
-                    hospitalsState = hospitals // Correct assignment
+                    hospitalsState.value = response.body() ?: emptyList()
                 } else {
                     Log.e("API Error", response.errorBody()?.string() ?: "Unknown error")
-                    Toast.makeText(this@Booktest, "Error fetching hospitals", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@Booktest, "Error fetching hospitals: ${response.code()} - ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<HospitalResponse>>, t: Throwable) {
-                Toast.makeText(this@Booktest, "Failed to fetch data: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@Booktest, "Failed to fetch hospitals: ${t.message}", Toast.LENGTH_SHORT).show()
                 Log.e("API Error", t.message.toString())
             }
         })
