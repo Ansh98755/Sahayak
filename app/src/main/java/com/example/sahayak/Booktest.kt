@@ -10,7 +10,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -25,7 +27,6 @@ import retrofit2.Response
 class Booktest : ComponentActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    // Declare a mutable state for hospitals
     private val hospitalsState = mutableStateOf(emptyList<HospitalResponse>())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +51,7 @@ class Booktest : ComponentActivity() {
         ) {
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
-            requestLocationUpdates()  // Start getting location updates
+            requestLocationUpdates()
         }
     }
 
@@ -66,8 +67,8 @@ class Booktest : ComponentActivity() {
 
     private fun requestLocationUpdates() {
         val locationRequest = LocationRequest.create().apply {
-            interval = 10000  // Update every 10 seconds
-            fastestInterval = 5000  // Fastest interval 5 seconds
+            interval = 10000
+            fastestInterval = 5000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
@@ -95,7 +96,7 @@ class Booktest : ComponentActivity() {
         val call = NominatimService.create().getNearbyHospitals("hospital", latitude = latitude, longitude = longitude)
         call.enqueue(object : Callback<List<HospitalResponse>> {
             override fun onResponse(call: Call<List<HospitalResponse>>, response: Response<List<HospitalResponse>>) {
-                Log.d("API Response", response.raw().toString()) // Log the raw response
+                Log.d("API Response", response.raw().toString())
 
                 if (response.isSuccessful) {
                     hospitalsState.value = response.body() ?: emptyList()
@@ -125,14 +126,38 @@ class Booktest : ComponentActivity() {
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Display each hospital in a column
             hospitals.forEach { hospital ->
-                Text(
-                    text = hospital.display_name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
+                HospitalItem(hospital)
             }
+        }
+    }
+
+    @Composable
+    fun HospitalItem(hospital: HospitalResponse) {
+        Column(
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .fillMaxWidth()
+                .clickable {
+                    showBookingDialog(hospital)
+                }
+                .padding(16.dp)
+                .background(MaterialTheme.colorScheme.primaryContainer)
+        ) {
+            Text(text = hospital.display_name, style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Available Beds: ${hospital.availability}", style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+
+    private fun showBookingDialog(hospital: HospitalResponse) {
+        val availability = hospital.availability
+        if (availability > 0) {
+            hospitalsState.value = hospitalsState.value.map {
+                if (it == hospital) it.copy(availability = availability - 1) else it
+            }
+            Toast.makeText(this, "Successfully booked a bed at ${hospital.display_name}", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "No beds available at ${hospital.display_name}", Toast.LENGTH_SHORT).show()
         }
     }
 }
