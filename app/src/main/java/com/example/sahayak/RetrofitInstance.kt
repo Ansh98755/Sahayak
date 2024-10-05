@@ -1,14 +1,19 @@
-package com.example.sahayak
-
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import com.example.sahayak.OpenCageService
+
 
 object RetrofitInstance {
-    val api: NominatimService by lazy {
+    private const val BASE_URL = "https://api.opencagedata.com/"  // Correct base URL for OpenCage API
+
+    private val retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://nominatim.openstreetmap.org/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(NominatimService::class.java)
+    }
+
+    val api: OpenCageService by lazy {
+        retrofit.create(OpenCageService::class.java)
     }
 }

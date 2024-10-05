@@ -11,13 +11,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+//import com.example.sahayak.
+//import com.example.sahayak.OpenCageService
 import com.example.sahayak.ui.theme.SahayakTheme
 import com.google.android.gms.location.*
 import retrofit2.Call
@@ -26,12 +29,10 @@ import retrofit2.Response
 
 class Booktest : ComponentActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-
-    private val hospitalsState = mutableStateOf(emptyList<HospitalResponse>())
+    private val hospitalsState = mutableStateOf(emptyList<OpenCageResponse.Result>())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         setContent {
@@ -93,20 +94,25 @@ class Booktest : ComponentActivity() {
     }
 
     private fun fetchNearbyHospitals(latitude: Double, longitude: Double) {
-        val call = NominatimService.create().getNearbyHospitals("hospital", latitude = latitude, longitude = longitude)
-        call.enqueue(object : Callback<List<HospitalResponse>> {
-            override fun onResponse(call: Call<List<HospitalResponse>>, response: Response<List<HospitalResponse>>) {
+        val apiKey = "b68827a65d794cd7bae27b350c344d68"
+        val countryCode = "IN" // Setting country code to India
+        val call = RetrofitInstance.api.getNearbyHospitals("hospital", apiKey, latitude, longitude, countryCode)
+        call.enqueue(object : Callback<OpenCageResponse> {
+            override fun onResponse(call: Call<OpenCageResponse>, response: Response<OpenCageResponse>) {
                 Log.d("API Response", response.raw().toString())
 
                 if (response.isSuccessful) {
-                    hospitalsState.value = response.body() ?: emptyList()
+                    // Filter results to ensure they are in India
+                    hospitalsState.value = response.body()?.results?.filter {
+                        it.components?.country == "India"
+                    } ?: emptyList()
                 } else {
                     Log.e("API Error", response.errorBody()?.string() ?: "Unknown error")
                     Toast.makeText(this@Booktest, "Error fetching hospitals: ${response.code()} - ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            override fun onFailure(call: Call<List<HospitalResponse>>, t: Throwable) {
+            override fun onFailure(call: Call<OpenCageResponse>, t: Throwable) {
                 Toast.makeText(this@Booktest, "Failed to fetch hospitals: ${t.message}", Toast.LENGTH_SHORT).show()
                 Log.e("API Error", t.message.toString())
             }
@@ -114,7 +120,7 @@ class Booktest : ComponentActivity() {
     }
 
     @Composable
-    fun HospitalListScreen(hospitals: List<HospitalResponse>) {
+    fun HospitalListScreen(hospitals: List<OpenCageResponse.Result>) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -133,31 +139,16 @@ class Booktest : ComponentActivity() {
     }
 
     @Composable
-    fun HospitalItem(hospital: HospitalResponse) {
+    fun HospitalItem(hospital: OpenCageResponse.Result) {
         Column(
             modifier = Modifier
-                .padding(vertical = 8.dp)
                 .fillMaxWidth()
-                .clickable {
-                    showBookingDialog(hospital)
-                }
-                .padding(16.dp)
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .clickable { /* Handle click */ }
+                .padding(8.dp)
+                .background(MaterialTheme.colorScheme.surface)
         ) {
-            Text(text = hospital.display_name, style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Available Beds: ${hospital.availability}", style = MaterialTheme.typography.bodyMedium)
-        }
-    }
-
-    private fun showBookingDialog(hospital: HospitalResponse) {
-        val availability = hospital.availability
-        if (availability > 0) {
-            hospitalsState.value = hospitalsState.value.map {
-                if (it == hospital) it.copy(availability = availability - 1) else it
-            }
-            Toast.makeText(this, "Successfully booked a bed at ${hospital.display_name}", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "No beds available at ${hospital.display_name}", Toast.LENGTH_SHORT).show()
+            Text(text = hospital.formatted, style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
