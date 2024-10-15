@@ -13,14 +13,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
-//import com.example.sahayak.
-//import com.example.sahayak.OpenCageService
 import com.example.sahayak.ui.theme.SahayakTheme
 import com.google.android.gms.location.*
 import retrofit2.Call
@@ -29,7 +28,7 @@ import retrofit2.Response
 
 class Booktest : ComponentActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val hospitalsState = mutableStateOf(emptyList<OpenCageResponse.Result>())
+    private var hospitalsState by mutableStateOf(emptyList<OpenCageResponse.Result>())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +36,7 @@ class Booktest : ComponentActivity() {
 
         setContent {
             SahayakTheme {
-                HospitalListScreen(hospitals = hospitalsState.value)
+                HospitalListScreen(hospitals = hospitalsState)
             }
         }
 
@@ -88,6 +87,7 @@ class Booktest : ComponentActivity() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult ?: return
             for (location in locationResult.locations) {
+                Log.d("Location", "Latitude: ${location.latitude}, Longitude: ${location.longitude}")
                 fetchNearbyHospitals(location.latitude, location.longitude)
             }
         }
@@ -95,17 +95,22 @@ class Booktest : ComponentActivity() {
 
     private fun fetchNearbyHospitals(latitude: Double, longitude: Double) {
         val apiKey = "b68827a65d794cd7bae27b350c344d68"
-        val countryCode = "IN" // Setting country code to India
-        val call = RetrofitInstance.api.getNearbyHospitals("hospital", apiKey, latitude, longitude, countryCode)
+        val call = RetrofitInstance.api.getNearbyHospitals("hospital", apiKey, latitude, longitude, "IN")
         call.enqueue(object : Callback<OpenCageResponse> {
             override fun onResponse(call: Call<OpenCageResponse>, response: Response<OpenCageResponse>) {
                 Log.d("API Response", response.raw().toString())
 
                 if (response.isSuccessful) {
                     // Filter results to ensure they are in India
-                    hospitalsState.value = response.body()?.results?.filter {
+                    val results = response.body()?.results?.filter {
                         it.components?.country == "India"
                     } ?: emptyList()
+
+                    // Update the hospitals state only if new data is received
+                    if (results != hospitalsState) {
+                        hospitalsState = results
+                        Log.d("Hospitals Updated", hospitalsState.toString())
+                    }
                 } else {
                     Log.e("API Error", response.errorBody()?.string() ?: "Unknown error")
                     Toast.makeText(this@Booktest, "Error fetching hospitals: ${response.code()} - ${response.message()}", Toast.LENGTH_SHORT).show()
@@ -125,30 +130,52 @@ class Booktest : ComponentActivity() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Text(
                 text = "Hospitals near you:",
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
-            Spacer(modifier = Modifier.height(16.dp))
 
-            hospitals.forEach { hospital ->
-                HospitalItem(hospital)
+            if (hospitals.isNotEmpty()) {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(hospitals) { hospital ->
+                        HospitalItem(hospital)
+                    }
+                }
+            } else {
+                Text(
+                    text = "No hospitals found near your location.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         }
     }
 
     @Composable
     fun HospitalItem(hospital: OpenCageResponse.Result) {
-        Column(
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { /* Handle click */ }
-                .padding(8.dp)
-                .background(MaterialTheme.colorScheme.surface)
+                .padding(vertical = 8.dp),
+            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
-            Text(text = hospital.formatted, style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(4.dp))
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = hospital.formatted,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = hospital.components?.city ?: "Unknown city",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
