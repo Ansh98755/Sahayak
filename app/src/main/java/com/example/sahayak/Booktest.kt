@@ -16,9 +16,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
+import android.content.Intent
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import com.example.sahayak.ui.theme.SahayakTheme
 import com.google.android.gms.location.*
@@ -156,10 +158,18 @@ class Booktest : ComponentActivity() {
 
     @Composable
     fun HospitalItem(hospital: OpenCageResponse.Result) {
+        val context = LocalContext.current
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 8.dp)
+                .clickable {
+                    // Navigate to HospitalDetailsActivity with hospital name
+                    val intent = Intent(context, HospitalDetailsActivity::class.java).apply {
+                        putExtra("hospital_name", hospital.formatted) // Passing hospital name
+                    }
+                    context.startActivity(intent)
+                },
             elevation = CardDefaults.cardElevation(4.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
@@ -178,4 +188,6 @@ class Booktest : ComponentActivity() {
             }
         }
     }
+
+
 }

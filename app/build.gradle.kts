@@ -68,36 +68,24 @@ dependencies {
 
     // Lottie for animations
     implementation("com.airbnb.android:lottie-compose:6.0.0")
-
-    // Google Play Services for Location API
     implementation("com.google.android.gms:play-services-location:21.0.1")
-
-    // Google Play Services Auth
     implementation("com.google.android.gms:play-services-auth:20.2.0")
-
-    // Firebase dependencies with BOM for versioning
     implementation(platform("com.google.firebase:firebase-bom:32.0.0"))
     implementation("com.google.firebase:firebase-auth")
-
-    // Retrofit and Gson for networking
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("com.google.code.gson:gson:2.8.8")
-
-    // Compose Material Icons
     implementation("androidx.compose.material:material-icons-core:1.5.1")
     implementation("androidx.compose.material:material-icons-extended:1.5.1")
-
-
-    // Testing dependencies
+//    implementation ("androidx.compose.material3:material3:1.0.0")
+//    implementation ("androidx.compose.ui:ui:1.4.0")
+    implementation ("androidx.compose.runtime:runtime-livedata:1.4.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-
-    // Debugging tools
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

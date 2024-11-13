@@ -74,6 +74,12 @@
             android:exported="true"
             android:label="@string/title_activity_signin_second"
             android:theme="@style/Theme.Sahayak" />
+        <activity
+            android:name=".HospitalDetailsActivity"
+            android:exported="true"
+            android:label="Hospital Details"
+            android:theme="@style/Theme.Sahayak" />
+
     </application>
 
 </manifest>
