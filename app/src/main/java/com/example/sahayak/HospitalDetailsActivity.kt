@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sahayak.ui.theme.SahayakTheme
 
+// Main Activity
 class HospitalDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +25,11 @@ class HospitalDetailsActivity : ComponentActivity() {
 
         setContent {
             SahayakTheme {
-                HospitalDetailsScreen(hospitalName = hospitalName, bedAvailability = bedAvailability)
+                // Pass the correct parameter name
+                HospitalDetailsScreen(
+                    hospitalName = hospitalName,
+                    initialBedAvailability = bedAvailability
+                )
             }
         }
     }
@@ -39,13 +44,17 @@ class HospitalDetailsActivity : ComponentActivity() {
     }
 }
 
+// Data Class for Bed Section
 data class BedSection(val sectionName: String, val availableBeds: Int)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HospitalDetailsScreen(hospitalName: String, bedAvailability: List<BedSection>) {
+fun HospitalDetailsScreen(hospitalName: String, initialBedAvailability: List<BedSection>) {
+    // State for bed availability
+    var bedAvailability by remember { mutableStateOf(initialBedAvailability) }
     var showBookingDialog by remember { mutableStateOf(false) }
     var selectedSection by remember { mutableStateOf<BedSection?>(null) }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -86,8 +95,18 @@ fun HospitalDetailsScreen(hospitalName: String, bedAvailability: List<BedSection
                     BookingDialog(
                         section = selectedSection!!,
                         onConfirm = {
+                            // Update bed availability
+                            bedAvailability = bedAvailability.map { section ->
+                                if (section.sectionName == selectedSection!!.sectionName) {
+                                    section.copy(availableBeds = section.availableBeds - 1)
+                                } else {
+                                    section
+                                }
+                            }
+
+                            // Show success message
                             Toast.makeText(
-                                LocalContext.current,
+                                context,
                                 "Bed booked in ${selectedSection!!.sectionName}",
                                 Toast.LENGTH_SHORT
                             ).show()
@@ -101,6 +120,7 @@ fun HospitalDetailsScreen(hospitalName: String, bedAvailability: List<BedSection
     )
 }
 
+// Composable for Bed Availability Item
 @Composable
 fun BedAvailabilityItem(section: BedSection, onBookClick: () -> Unit) {
     Column(
@@ -129,14 +149,15 @@ fun BedAvailabilityItem(section: BedSection, onBookClick: () -> Unit) {
     }
 }
 
+// Booking Dialog
 @Composable
-fun BookingDialog(section: BedSection, onConfirm: @Composable () -> Unit, onCancel: () -> Unit) {
+fun BookingDialog(section: BedSection, onConfirm: () -> Unit, onCancel: () -> Unit) {
     AlertDialog(
         onDismissRequest = onCancel,
         title = { Text("Booking Confirmation") },
         text = { Text("Are you sure you want to book a bed in ${section.sectionName}?") },
         confirmButton = {
-            Button(onClick = onConfirm as () -> Unit) {
+            Button(onClick = onConfirm) {
                 Text("Confirm")
             }
         },
@@ -154,7 +175,7 @@ fun DefaultPreview() {
     SahayakTheme {
         HospitalDetailsScreen(
             hospitalName = "Sample Hospital",
-            bedAvailability = listOf(
+            initialBedAvailability = listOf(
                 BedSection("General Ward", 10),
                 BedSection("ICU", 2)
             )
