@@ -28,7 +28,6 @@ class IntermediateActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // Intermediate Screen Content
             UserStaffSelection(
                 onUserClick = { navigateToMainActivity() },
                 onStaffClick = { navigateToStaffActivity() }
@@ -37,13 +36,10 @@ class IntermediateActivity : ComponentActivity() {
     }
 
     fun navigateToStaffActivity() {
-        val intent = Intent(this, StaffActivity::class.java) // Change this line
+        val intent = Intent(this, StaffActivity::class.java)
         startActivity(intent)
         finish()
     }
-
-
-    // Navigation to MainActivity
     private fun navigateToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
@@ -53,27 +49,21 @@ class IntermediateActivity : ComponentActivity() {
 
 @Composable
 fun UserStaffSelection(onUserClick: () -> Unit, onStaffClick: () -> Unit) {
-    // Background Image with overlay content
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // Background Image
         Image(
-            painter = painterResource(id = R.drawable.covero), // Your background image here
+            painter = painterResource(id = R.drawable.covero),
             contentDescription = null,
-            contentScale = ContentScale.Crop, // Ensures image fills the screen
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-
-        // Overlay Shade
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xAA000000)) // Semi-transparent black overlay
+                .background(Color(0xAA000000))
         )
-
-        // Content
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -81,7 +71,6 @@ fun UserStaffSelection(onUserClick: () -> Unit, onStaffClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Text "LOGIN AS" in bold and italics
             Text(
                 text = "LOGIN AS",
                 fontSize = 30.sp,
@@ -91,8 +80,6 @@ fun UserStaffSelection(onUserClick: () -> Unit, onStaffClick: () -> Unit) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 40.dp)
             )
-
-            // USER button
             Button(
                 onClick = onUserClick,
                 modifier = Modifier
@@ -106,8 +93,6 @@ fun UserStaffSelection(onUserClick: () -> Unit, onStaffClick: () -> Unit) {
                     fontSize = 18.sp
                 )
             }
-
-            // STAFF button
             Button(
                 onClick = onStaffClick,
                 modifier = Modifier

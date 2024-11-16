@@ -14,8 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sahayak.ui.theme.SahayakTheme
-
-// Main Activity
 class HospitalDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +23,6 @@ class HospitalDetailsActivity : ComponentActivity() {
 
         setContent {
             SahayakTheme {
-                // Pass the correct parameter name
                 HospitalDetailsScreen(
                     hospitalName = hospitalName,
                     initialBedAvailability = bedAvailability
@@ -43,8 +40,6 @@ class HospitalDetailsActivity : ComponentActivity() {
         )
     }
 }
-
-// Data Class for Bed Section
 data class BedSection(val sectionName: String, val availableBeds: Int)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,8 +98,6 @@ fun HospitalDetailsScreen(hospitalName: String, initialBedAvailability: List<Bed
                                     section
                                 }
                             }
-
-                            // Show success message
                             Toast.makeText(
                                 context,
                                 "Bed booked in ${selectedSection!!.sectionName}",
@@ -119,8 +112,6 @@ fun HospitalDetailsScreen(hospitalName: String, initialBedAvailability: List<Bed
         }
     )
 }
-
-// Composable for Bed Availability Item
 @Composable
 fun BedAvailabilityItem(section: BedSection, onBookClick: () -> Unit) {
     Column(
@@ -148,8 +139,6 @@ fun BedAvailabilityItem(section: BedSection, onBookClick: () -> Unit) {
         }
     }
 }
-
-// Booking Dialog
 @Composable
 fun BookingDialog(section: BedSection, onConfirm: () -> Unit, onCancel: () -> Unit) {
     AlertDialog(

@@ -46,12 +46,8 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 
 class SigninActivity : ComponentActivity() {
-
-    // Google Sign-In variables
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
-
-    // Register for activity result
     private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK && result.data != null) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -61,19 +57,13 @@ class SigninActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
-
-        // Google Sign-In setup
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .requestIdToken(getString(R.string.default_web_client_id)) // Ensure you have this ID from Google Cloud Console
+            .requestIdToken(getString(R.string.default_web_client_id))
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
-
-        // Compose UI setup
         setContent {
             SahayakTheme {
                 SignInScreen(
@@ -92,9 +82,7 @@ class SigninActivity : ComponentActivity() {
     }
 
     private fun signInWithGoogle() {
-        // Sign out any existing Google accounts to refresh the account picker
         googleSignInClient.signOut().addOnCompleteListener {
-            // After signing out, launch the Google Sign-In Intent
             val signInIntent = googleSignInClient.signInIntent
             signInLauncher.launch(signInIntent)
         }
@@ -107,10 +95,8 @@ class SigninActivity : ComponentActivity() {
                 val credential = GoogleAuthProvider.getCredential(account.idToken, null)
                 auth.signInWithCredential(credential).addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        // Sign in success
                         navigateToNextActivity()
                     } else {
-                        // Sign in failed
                         Toast.makeText(this, "Google Sign-In failed: ${task.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -123,10 +109,8 @@ class SigninActivity : ComponentActivity() {
     private fun signInWithEmail(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
-                // Sign in success
                 navigateToNextActivity()
             } else {
-                // Sign in failed
                 Toast.makeText(this, "Manual Sign-In failed: ${task.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
         }
@@ -156,21 +140,18 @@ fun SignInScreen(
         modifier = modifier
             .fillMaxSize()
     ) {
-        // Background image
         Image(
-            painter = painterResource(id = R.drawable.covero), // Replace with your background image resource
+            painter = painterResource(id = R.drawable.covero),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
-        // Overlay content
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .background(Color.Transparent) // Set background to transparent to see the background image
+                .background(Color.Transparent)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo),

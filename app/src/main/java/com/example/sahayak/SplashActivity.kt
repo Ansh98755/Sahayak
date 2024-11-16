@@ -39,22 +39,18 @@ class SplashActivity : ComponentActivity() {
 
 @Composable
 fun SplashScreen(onTimeout: () -> Unit) {
-    // Use LaunchedEffect to navigate after a delay
     LaunchedEffect(Unit) {
-        delay(4000)  // 4 seconds delay
+        delay(4000)
         onTimeout()
     }
-
-    // Layout for the splash screen with Lottie animation and text
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // Center content
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.Center),  // Center alignment
+                .align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LottieAnimation(
@@ -65,8 +61,6 @@ fun SplashScreen(onTimeout: () -> Unit) {
                 iterations = LottieConstants.IterateForever
             )
         }
-
-        // Bottom text
         Text(
             text = "Book Your Bed",
             fontSize = 30.sp,
@@ -76,7 +70,7 @@ fun SplashScreen(onTimeout: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .align(Alignment.BottomCenter)  // Align text to the bottom center
+                .align(Alignment.BottomCenter)
 
         )
     }

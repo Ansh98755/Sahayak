@@ -103,12 +103,9 @@ class Booktest : ComponentActivity() {
                 Log.d("API Response", response.raw().toString())
 
                 if (response.isSuccessful) {
-                    // Filter results to ensure they are in India
                     val results = response.body()?.results?.filter {
                         it.components?.country == "India"
                     } ?: emptyList()
-
-                    // Update the hospitals state only if new data is received
                     if (results != hospitalsState) {
                         hospitalsState = results
                         Log.d("Hospitals Updated", hospitalsState.toString())
@@ -164,9 +161,8 @@ class Booktest : ComponentActivity() {
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
                 .clickable {
-                    // Navigate to HospitalDetailsActivity with hospital name
                     val intent = Intent(context, HospitalDetailsActivity::class.java).apply {
-                        putExtra("hospital_name", hospital.formatted) // Passing hospital name
+                        putExtra("hospital_name", hospital.formatted)
                     }
                     context.startActivity(intent)
                 },

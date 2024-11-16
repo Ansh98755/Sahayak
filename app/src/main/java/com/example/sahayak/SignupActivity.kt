@@ -36,10 +36,8 @@ class SignupActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
 
-        // Set Compose content
         setContent {
             SahayakTheme {
                 SignUpScreen(
@@ -59,8 +57,6 @@ class SignupActivity : ComponentActivity() {
             Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
             return
         }
-
-        // Create user with email and password
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -80,7 +76,7 @@ class SignupActivity : ComponentActivity() {
     }
 
     private fun saveEmailToPrefs(email: String) {
-        val sharedPreferences = getSharedPreferences("SahayakPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("SahayakPrefs", MODE_PRIVATE)
         sharedPreferences.edit().putString("savedEmail", email).apply()
     }
 }
@@ -98,9 +94,8 @@ fun SignUpScreen(
         modifier = modifier
             .fillMaxSize()
     ) {
-        // Background image
         Image(
-            painter = painterResource(id = R.drawable.cover1), // Ensure this resource exists
+            painter = painterResource(id = R.drawable.cover1),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -109,10 +104,8 @@ fun SignUpScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.4f)) // Adjust alpha for desired opacity
+                .background(Color.Black.copy(alpha = 0.4f))
         )
-
-        // Foreground content
         Column(
             modifier = Modifier
                 .fillMaxSize()

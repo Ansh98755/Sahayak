@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
             SahayakApp(
                 onLoginClick = { navigateTo(SigninActivity::class.java) },
                 onRegisterClick = { navigateTo(SignupActivity::class.java) },
-                onSkipClick = { navigateTo(Booktest::class.java) } // Added listener for Skip
+                onSkipClick = { navigateTo(Booktest::class.java) }
             )
         }
     }
@@ -51,7 +51,6 @@ fun SahayakApp(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, onSkipClic
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Background Image
             Image(
                 painter = painterResource(id = R.drawable.cover1),
                 contentDescription = null,
@@ -77,8 +76,6 @@ fun SahayakApp(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, onSkipClic
                         .size(200.dp)
                         .padding(bottom = 10.dp)
                 )
-
-                // Sahayak App Title
                 Text(
                     text = "Sahayak",
                     fontSize = 50.sp,
@@ -90,8 +87,6 @@ fun SahayakApp(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, onSkipClic
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
-
-                // Register Button
                 Button(
                     onClick = onRegisterClick,
                     modifier = Modifier
@@ -101,8 +96,6 @@ fun SahayakApp(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, onSkipClic
                 ) {
                     Text(text = "Register", color = Color.White)
                 }
-
-                // Login Button
                 Button(
                     onClick = onLoginClick,
                     modifier = Modifier
@@ -114,8 +107,6 @@ fun SahayakApp(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, onSkipClic
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                // Skip Text
                 Text(
                     text = "Skip",
                     fontSize = 20.sp,
@@ -123,7 +114,7 @@ fun SahayakApp(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, onSkipClic
                     color = Color.White,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onSkipClick() } // Updated to call onSkipClick
+                        .clickable { onSkipClick() }
                         .padding(vertical = 8.dp),
                     textAlign = TextAlign.Center
                 )
